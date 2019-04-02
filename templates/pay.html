@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <form action="/pay/" method="POST">
+    {% csrf_token %}
+        <label for="start">租赁开始时间：</label><input name="start" type="date" value="{{ now|date:'Y-m-d' }}"/>
+        <label for="last">租赁结束时间：</label><input name="last" type="date" value="{{ last|date:'Y-m-d' }}"/>
+        <input type="submit" class="btn-primary" value="支付宝支付" >
+        <input type="hidden" value="{{ house_num }}" name="house_num">
+
+    </form>
+{% endblock %}

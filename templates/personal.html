@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="tabbable" id="tabs-862085">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a data-toggle="tab" href="#panel-541420">关注房源</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#panel-171881">设置密码</a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#panel-541421">我的订单</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="panel-541420">
+                            {% for house in  check_houses %}
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="thumbnail">
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        <img src="/media/{{ house.house.title_img }}" alt="...">
+                                                    </div>
+                                                    <div class="caption col-sm-8">
+                                                        <h3>
+                                                            <a href="/detail/{{ house.house.huose_num }}">{{ house.house.title }}</a>
+                                                        </h3>
+                                                        <p>房源号: {{ house.house.huose_num }}</p>
+                                                        <p>小区: {{ house.house.house_name }}</p>
+                                                        <p>面积: {{ house.house.area }} 平米</p>
+                                                        <p>{{ house.house.bedroom_num }} 室
+                                                            | {{ house.house.drawing_room_num }}
+                                                            厅</p>
+                                                        <p>{{ house.house.get_orientation_display }}
+                                                            , {{ house.house.get_floor_type_display }}
+                                                            , 共 {{ house.house.floor_num }} 层</p>
+                                                        <strong>{{ house.house.month_price }} </strong><span
+                                                            style="color: red"> 元/月</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+                            {% endfor %}
+
+                        </div>
+                        <div class="tab-pane" id="panel-171881">
+                            <form class="form-horizontal col-md-4">
+                                <div class="form-group">
+                                    <label for="old_password">旧密码</label>
+                                    <input type="text" id="old_password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="new_password">新密码</label>
+                                    <input type="password" id="new_password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="renew_password">确认新密码</label>
+                                    <input type="password" id="renew_password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <input type="button" value="确认修改" class="btn btn-primary " id="btn"><span
+                                        class="error"></span>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="panel-541421">
+                            <div class="container-fluid">
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>
+                                                    订单号
+                                                </th>
+                                                <th>
+                                                    房源号
+                                                </th>
+                                                <th>
+                                                    租赁开始时间
+                                                </th>
+                                                 <th>
+                                                    租赁结束时间
+                                                </th>
+                                                <th>
+                                                    订单状态
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for order in orders %}
+
+
+
+                                            <tr class="success">
+                                                <td>
+                                                    {{ order.order_id }}
+                                                </td>
+                                                <td>
+                                                    {{ order.house.huose_num }}
+                                                </td>
+                                                <td>
+                                                    {{ order.start_date|date:"Y-m-d" }}
+                                                </td>
+                                                <td>
+                                                    {{ order.past_date|date:"Y-m-d"  }}
+                                                </td>
+                                                <td>
+                                                    {% if order.order_state %}
+                                                        已支付成功
+                                                        {% else %}
+                                                        还未支付
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block detail_js %}
+
+    <script>
+
+        //清楚错误信息
+        $(".form-group input").focus(function () {
+            $(".error").text("")
+        })
+
+        $("#btn").click(function () {
+            $.ajax({
+                url: "/change_password/",
+                type: "post",
+                data: {
+                    "old_password": $("#old_password").val(),
+                    "new_password": $("#new_password").val(),
+                    "renew_password": $("#renew_password").val(), "csrfmiddlewaretoken": "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    if (data.status == 100) {
+                        alert(data.msg);
+                        location.href = "/login/"
+                    } else {
+                        $(".error").text(data.msg)
+                    }
+
+                }
+            })
+        })
+    </script>
+
+
+
+{% endblock %}

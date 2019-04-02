@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="path1">
+        <ol class="breadcrumb" id="location">
+            <li><h4>区域:</h4></li>
+            {% if kwargs.location == 0 %}
+                <li><a class="active" href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">全部</a>
+                </li>
+            {% else %}
+                <li><a href="/home-{{ 0 }}-{{ kwargs.price }}-{{ kwargs.area }}">全部</a></li>
+            {% endif %}
+
+            {% for k,v in location_dic.items %}
+                {% if v == kwargs.location %}
+                    <li><a class="active"
+                           href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">{{ k }}</a></li>
+                {% else %}
+                    <li><a href="/home-{{ v }}-{{ kwargs.price }}-{{ kwargs.area }}">{{ k }}</a></li>
+                {% endif %}
+
+            {% endfor %}
+
+
+        </ol>
+    </div>
+    <div class="path2">
+
+        <ol class="breadcrumb">
+            <li><h4>租金:</h4></li>
+            {% if kwargs.price == 0 %}
+                <li><a class="active" href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">全部</a>
+                </li>
+            {% else %}
+                <li><a href="/home-{{ kwargs.location }}-{{ 0 }}-{{ kwargs.area }}">全部</a></li>
+            {% endif %}
+
+            {% for k,v in price_dic.items %}
+                {% if v == kwargs.price %}
+                    <li><a class="active"
+                           href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">{{ k }}</a></li>
+                {% else %}
+                    <li><a href="/home-{{ kwargs.location }}-{{ v }}-{{ kwargs.area }}">{{ k }}</a></li>
+                {% endif %}
+
+            {% endfor %}
+
+        </ol>
+    </div>
+    <div class="path3">
+
+        <ol class="breadcrumb">
+            <li><h4>面积:</h4></li>
+                        {% if kwargs.area == 0 %}
+                <li><a class="active" href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">全部</a>
+                </li>
+            {% else %}
+                <li><a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ 0 }}">全部</a></li>
+            {% endif %}
+
+            {% for k,v in area_dic.items %}
+                {% if v == kwargs.area %}
+                    <li><a class="active"
+                           href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}">{{ k }}</a></li>
+                {% else %}
+                    <li><a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ v }}">{{ k }}</a></li>
+                {% endif %}
+
+            {% endfor %}
+
+        </ol>
+    </div>
+    <div class="content">
+        <ul class="media">
+            {% for house in page %}
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="thumbnail">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <img src="/media/{{ house.title_img }}" alt="...">
+                                    </div>
+                                    <div class="caption col-sm-8">
+                                        <h3><a href="/detail/{{ house.huose_num }}">{{ house.title }}</a></h3>
+                                        <p>房源号: {{ house.huose_num }}</p>
+                                        <p>小区: {{ house.house_name }}</p>
+                                        <p>面积: {{ house.area }} 平米</p>
+                                        <p>{{ house.bedroom_num }} 室 | {{ house.drawing_room_num }} 厅</p>
+                                        <p>{{ house.get_orientation_display }} , {{ house.get_floor_type_display }}
+                                            , 共 {{ house.floor_num }} 层</p>
+                                        <strong>{{ house.month_price }} </strong><span style="color: red"> 元/月</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+            {% endfor %}
+        </ul>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page.has_previous %}
+                    <li>
+                        <a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}-{{ page.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a href="#" aria-label="Previous ">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_range %}
+
+                    {% if num == current_page %}
+                        <li class="item active"><a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}-{{ num }}">{{ num }}</a></li>
+                    {% else %}
+                        <li><a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}-{{ num }}">{{ num }}</a></li>
+
+                    {% endif %}
+                {% endfor %}
+
+                {% if page.has_next %}
+                    <li>
+                        <a href="/home-{{ kwargs.location }}-{{ kwargs.price }}-{{ kwargs.area }}-{{ page.next_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled">
+                        <a href="#" aria-label="Previous ">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    </div>
+{% endblock %}

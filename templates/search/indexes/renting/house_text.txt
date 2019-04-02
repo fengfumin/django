@@ -1,0 +1,3 @@
+{{ object.title }}
+{{ object.house_name }}
+{{ object.huose_num }}

@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        ul {
+            list-style: none;
+        }
+    </style>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+        <style type="text/css">
+            body, html {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+
+            #allmap {
+                width: 100%;
+                height: 500px;
+            }
+
+            p {
+                margin-left: 5px;
+                font-size: 14px;
+            }
+
+            .list-group {
+                font-size: 20px;
+            }
+
+            .house-detail li {
+                float: left;
+                width: 320px;
+            }
+
+            .house-detail p {
+                font-size: 20px;
+            }
+
+            .headerCell p {
+                font-size: 20px;
+                color: red;
+                font-weight: 700;
+            }
+
+            .group li {
+                float: left;
+            }
+
+            .group p {
+                font-size: 20px;
+            }
+
+        </style>
+        <script type="text/javascript"
+                src="http://api.map.baidu.com/api?v=2.0&ak=WGuAIyDuAaiIKVeLu7T8OFdZuGucUGY3"></script>
+
+    </head>
+
+    <div class="container-fluid">
+        <div class="title col-md-12">
+            <div class="col-md-6">
+                <h3>{{ house.title }}</h3>
+                <p>房源号:{{ house.huose_num }}</p>
+                <br>
+            </div>
+            <div class="col-md-6">
+                <div class="pull">
+                    {% if request.user.is_authenticated %}
+                        {% if Focus.attention %}
+                            <h3>
+                                <button type="button" class="btn btn-warning" id="attention">您已关注</button>
+                            </h3>
+                        {% else %}
+                            <h3>
+                                <button type="button" class="btn btn-default" id="attention">关注点我</button>
+                            </h3>
+
+                        {% endif %}
+
+                    {% else %}
+                        <h3>
+                            <button type="button" class="btn btn-default"><a href="/login/">关注点我</a></button>
+                        </h3>
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="pic">
+            <div class="col-md-6">
+                <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        {% for foo in pic_list %}
+                            {% if forloop.counter == 1 %}
+                                <li data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}"
+                                    class="active"></li>
+                            {% else %}
+                                <li data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}"></li>
+                            {% endif %}
+                        {% endfor %}
+
+
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                        {% for pic in pic_list %}
+                            {% if forloop.counter == 1 %}
+                                <div class="item active">
+                                    <img src="/media/{{ pic.picture }}" alt="...">
+                                    <div class="carousel-caption">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="item">
+                                    <img src="/media/{{ pic.picture }}" alt="...">
+                                    <div class="carousel-caption">
+                                    </div>
+                                </div>
+
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- Controls -->
+                    <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="msg clearfix">
+                    <div class="rule pull-left">
+                        <ul class="headerCell">
+                            <li><p>{{ house.month_price }} 租金 (元/月)</p></li>
+                            <li><p>{{ house.bedroom_num }}室{{ house.drawing_room_num }}厅 户型</p></li>
+                            <li><p>{{ house.area }} 面积(平米)</p></li>
+                        </ul>
+                    </div>
+                    <div class="rule pull-right">
+                        <ul class="headerCell">
+                            {% if check %}
+                                <li><p>近一次带看: {{ check.check_date|date:"Y-m-d" }}</p></li>
+                            {% else %}
+                                <li><p>近一次带看: 无</p></li>
+                            {% endif %}
+                            {% if check_seven %}
+                                <li><p>近7天带看: {{ check_seven.count }} 次</p></li>
+                            {% else %}
+                                <li><p>近7天带看: 0 次</p></li>
+                            {% endif %}
+                            {% if check_thirty %}
+                                <li><p>近30天带看: {{ check_thirty.count }} 次</p></li>
+                            {% else %}
+                                <li><p>近7天带看: 0 次</p></li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+                <ul class="house-detail ">
+                    <li><p>小区: {{ house.house_name }}</p></li>
+                    <li><p>楼层: {{ house.get_floor_type_display }}/{{ house.floor_num }}层</p></li>
+                    <li><p>朝向: {{ house.get_orientation_display }}</p></li>
+                    <li><p>装修: {{ house.get_decoration_display }}</p></li>
+                    <li><p>出租方式: {{ house.get_rent_way_display }}</p></li>
+                    <li><p>看房时间: 电话预约</p></li>
+                    <li><p>商圈: {{ house.trading_area }}</p></li>
+
+                    <li></li>
+                </ul>
+
+                <div class="">
+                    {% if request.user.is_authenticated %}
+                        <a href="/pay/?house={{ house.huose_num }}">
+                        <button class="btn btn-primary btn-lg" type="button" id="pay">
+                             在线支付
+                        </button>
+                        </a>
+                    {% else %}
+                        <button class="btn btn-primary btn-lg" type="button" id="pay">
+                            在线支付,请先登入
+                        </button>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <div class="Facilities">
+            <div class="col-md-8">
+                <hr>
+                <h2>房源配套设施</h2>
+                <ul class="group">
+                    <li><img src="/static/img/washing_machine.jpg" alt="">
+                        {% if Facilities.washing_machine %}
+                            <p align="center">洗衣机</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">洗衣机</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/fridge.jpg" alt="">
+                        {% if Facilities.refrigerator %}
+                            <p align="center">冰箱</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">冰箱</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/TV1.jpg" alt="">
+                        {% if Facilities.television %}
+                            <p align="center">电视</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">电视</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/air_%20conditioner.jpg" alt="">
+                        {% if Facilities.air_conditioner %}
+                            <p align="center">空调</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">空调</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/heating.jpg" alt="">
+                        {% if Facilities.water_heater %}
+                            <p align="center">热水器</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">热水器</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/fire.jpg" alt="">
+                        {% if Facilities.natural_gas %}
+                            <p align="center">天然气</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">天然气</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/bed.jpg" alt="">
+                        {% if Facilities.bed %}
+                            <p align="center">床</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">床</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/wifi.jpg" alt="">
+                        {% if Facilities.wifi %}
+                            <p align="center">网络</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">网络</p></li>
+                        {% endif %}
+                    <li><img src="/static/img/dainti.jpg" alt="">
+                        {% if Facilities.elevator %}
+                            <p align="center">电梯</p></li>
+                        {% else %}
+                            <p align="center" style="text-decoration:line-through;">电梯</p></li>
+                        {% endif %}
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <hr>
+                <div class="thumbnail container-fluid">
+                    <div class="col-sm-4">
+                        <img src="/media{{ broker.img }}" alt="...">
+                    </div>
+                    <div class="caption col-sm-8">
+                        <h3>{{ broker.nickname }}</h3>
+                        <h4>预约电话: {{ broker.phone }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="massage col-md-8">
+            <hr>
+            <h2>房源特色</h2>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-success"><span>房源亮点:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ Characteristics.lightspot }}</li>
+                <hr>
+                <li class="list-group-item list-group-item-success"><span>户型介绍:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ Characteristics.introduce }}</li>
+                <hr>
+                <li class="list-group-item list-group-item-success"><span>交通出行:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ Characteristics.traffic }}</li>
+                <hr>
+                <li class="list-group-item list-group-item-success"><span>周边配套:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ Characteristics.rim }}</li>
+                <hr>
+                <li class="list-group-item list-group-item-success"><span>小区信息:</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ Characteristics.housing_message }}</li>
+
+            </ul>
+
+        </div>
+        <div class="map col-md-8">
+            <hr>
+            <h2>周边配套</h2>
+            <div>
+
+                <div id="allmap"></div>
+                <div id="r-result"></div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block detail_js %}
+
+
+    <script type="text/javascript">
+        // 百度地图API功能
+        var map = new BMap.Map("allmap");            // 创建Map实例
+        var mPoint = new BMap.Point({{ lng }}, {{ lat }});
+        //map.enableScrollWheelZoom();
+        map.centerAndZoom(mPoint, 16);
+
+        var circle = new BMap.Circle(mPoint, 1000, {
+            fillColor: "blue",
+            strokeWeight: 1,
+            fillOpacity: 0.3,
+            strokeOpacity: 0.3
+        });
+        map.addOverlay(circle);
+        var local = new BMap.LocalSearch(map, {
+            renderOptions: {map: map, autoViewport: false, panel: "r-result"},
+            pageCapacity: 3
+        });
+        var myKeys = ["商场", "医院", "学校"];
+        local.searchNearby(myKeys, mPoint, 1000);
+
+
+        var marker = new BMap.Marker(new BMap.Point({{ lng }}, {{ lat }})); // 创建点
+        marker.addEventListener("click", attribute);
+        map.addOverlay(marker);    //增加点
+
+        function attribute() {
+            alert("小区名称:" + "{{ house.house_name }}");
+        }
+
+        var top_left_navigation = new BMap.NavigationControl();
+        map.addOverlay(top_left_navigation);
+
+
+        $("#attention").click(function () {
+            var attention = $(this).hasClass("btn-default");
+            $.ajax({
+                url: "/attention/",
+                type: "post",
+                data: {"house_id":{{ house.pk }}, "attention": attention, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                success: function (data) {
+                    console.log(data);
+                    if (data.status == 100) {
+                        $("#attention").removeClass('btn-default')
+                        $("#attention").addClass("btn-warning");
+                        $("#attention").text("您已关注");
+                    } else {
+                        $("#attention").removeClass('btn-warning')
+                        $("#attention").addClass("btn-default");
+                        $("#attention").text("关注点我");
+                    }
+                }
+            })
+        })
+
+    </script>
+
+{% endblock %}
+

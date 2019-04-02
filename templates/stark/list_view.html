@@ -1,0 +1,71 @@
+{% extends 'stark/base.html' %}
+
+
+{% block content %}
+    <h3>数据展示</h3>
+    <div class="col-md-8 col-md-offset-1">
+        <a href="{{ url }}" class="btn btn-primary">添加数据</a>
+        {#search功能开始#}
+        {% if show_obj.config_obj.search_fields %}
+            <form class="form-inline pull-right">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="关键字" name="q"
+                           value="{{ show_obj.config_obj.key_word }}">
+                </div>
+                <button type="submit" class="btn btn-success">Search</button>
+            </form>
+        {% endif %}
+        {#search功能结束#}
+        <form action="" class="form-inline" method="post">
+            {% csrf_token %}
+            {#    actions功能开始#}
+            {% if show_obj.config_obj.actions %}
+                <select name="action" id="" class="form-control">
+                    <option value="">- - - - - - - - - -</option>
+                    {% for foo_dict in show_obj.get_actions %}
+                        <option value="{{ foo_dict.name }}">{{ foo_dict.desc }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" class="btn btn-danger" value="GO!">
+            {% endif %}
+
+            {#    actions功能结束#}
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr>
+                    {% for foo in show_obj.get_header %}
+                        <th>{{ foo }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for body in show_obj.get_body %}  <!--[[obj1.title,obj1.price,obj1....],[],[]]-->
+                    <tr>
+                        {% for foo in body %}
+                            <td>{{ foo }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        {{ show_obj.page_obj.page_html|safe }}
+    </div>
+    <div class="col-md-3">
+        {% if show_obj.config_obj.list_filter %}
+            <div class="alert-info text-center">FILTER</div>
+            {% for k,v in show_obj.get_filter.items %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">By {{ k }}</div>
+                    <div class="panel-body">
+                        {% for foo in v %}
+                            <p>{{ foo }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+
+{% endblock %}

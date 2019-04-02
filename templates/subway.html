@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+        <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <script type="text/javascript"
+            src="https://api.map.baidu.com/api?type=subway&v=1.0&ak=WGuAIyDuAaiIKVeLu7T8OFdZuGucUGY3"></script>
+
+    <style type="text/css">
+        #container {
+            {#height:100%#}
+            height: 2500px;
+            width: 3500px;
+        }
+    </style>
+{% endblock %}
+
+{% block map %}
+
+
+    <div id="container"></div>
+{% endblock %}
+
+{% block detail_js %}
+    <script type="text/javascript">
+        /**
+         * 从所有城市列表中获取北京信息
+         * 结果格式
+         * {
+         *     keyword: 'beijing',
+         *     name: '北京',
+         *     citycode: '131'
+         * }
+         */
+        /* globals BMapSub */
+        var subwayCityName = '上海';
+        var list = BMapSub.SubwayCitiesList;
+        var subwaycity = null;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].name === subwayCityName) {
+                subwaycity = list[i];
+                break;
+            }
+        }
+        // 获取上海地铁数据-初始化地铁图
+    var subway = new BMapSub.Subway('container', subwaycity.citycode);
+    subway.setZoom(0.5);
+
+    </script>
+{% endblock %}
